@@ -1,10 +1,12 @@
 package WebService::Recruit::Dokoiku;
 use strict;
-use Class::Accessor::Fast;
-use XML::OverHTTP;
 use base qw( Class::Accessor::Fast );
 use vars qw( $VERSION );
-$VERSION = '0.07';
+$VERSION = '0.10';
+
+use WebService::Recruit::Dokoiku::SearchPOI;
+use WebService::Recruit::Dokoiku::GetLandmark;
+use WebService::Recruit::Dokoiku::GetStation;
 
 my $PARAMS = [qw( key pagesize )];
 my $TPPCFG = [qw( user_agent lwp_useragent http_lite utf8_flag )];
@@ -38,54 +40,6 @@ sub init_query_param {
         $api->add_param( $key => $self->{$key} );
     }
 }
-
-package WebService::Recruit::Dokoiku::API;
-use strict;
-use base qw( XML::OverHTTP );
-use vars qw( $VERSION );
-$VERSION = $WebService::Recruit::Dokoiku::VERSION;
-
-sub default_param { { format => 'xml' }; }
-sub notnull_param { [qw( key )]; }
-sub attr_prefix { ''; }
-sub root_elem { 'results'; }
-
-sub is_error {
-    my $self = shift;
-    my $root = $self->root();
-    $root->status();                # 0 means ok
-}
-sub total_entries {
-    my $self = shift;
-    my $root = $self->root() or return;
-    $root->{totalcount} || 0;
-}
-sub entries_per_page {
-    my $self = shift;
-    my $root = $self->root() or return;
-    $root->{pagesize} || 10;
-}
-sub current_page {
-    my $self = shift;
-    my $root = $self->root() or return;
-    $root->{pagenum} || 1;
-}
-sub page_param {
-    my $self = shift;
-    my $page = shift || $self->current_page();
-    my $size = shift || $self->entries_per_page();
-    my $hash = shift || {};
-    $hash->{pagenum}  = $page if defined $page;
-    $hash->{pagesize} = $size if defined $size;
-    $hash;
-}
-
-package WebService::Recruit::Dokoiku;           # again
-use strict;
-
-use WebService::Recruit::Dokoiku::SearchPOI;
-use WebService::Recruit::Dokoiku::GetLandmark;
-use WebService::Recruit::Dokoiku::GetStation;
 
 sub searchPOI {
     my $self = shift or return;
@@ -155,66 +109,51 @@ and L</getStation>.
 With these methods, you can find almost all of shops, restaurants
 and many other places in Japan.
 
-=head3 searchPOI
+=head1 METHODS
 
+=head2 new
+
+This is the constructor method for this class.
+
+    my $doko = WebService::Recruit::Dokoiku->new();
+
+This accepts optional parameters.
+
+    my $conf = { key => 'your_auth_key', utf8_flag => 1 };
+    my $doko = WebService::Recruit::Dokoiku->new( %$conf );
+
+=head2 key
+
+A valid developer key is required to make a request.
+
+    $doko->key( 'your_auth_key' );
+
+=head2 searchPOI
+
+This makes a request for C<searchPOI> API.
 See L<WebService::Recruit::Dokoiku::SearchPOI> for details.
 
     my $res = $doko->searchPOI( lmcode => 4212, name => 'ATM' );
 
-=head3 getLandmark
+=head2 getLandmark
 
+This makes a request for C<getLandmark> API.
 See L<WebService::Recruit::Dokoiku::GetLandmark> for details.
 
     my $res = $doko->getLandmark( name => 'SHIBUYA 109' );
 
-=head3 getStation
+=head2 getStation
 
+This makes a request for C<getStation> API.
 See L<WebService::Recruit::Dokoiku::GetStation> for details.
 
     my $res = $doko->getStation( lon_jgd => 139.758, lat_jgd => 35.666 );
 
-=head2 PAGING
-
-Each API response also provides paging methods following:
-
-=head3 page
-
-C<page> method returns a L<Data::Page> instance.
-
-    my $page = $res->page();
-    print "Total: ", $page->total_entries, "\n";
-    print "Page: ", $page->current_page, "\n";
-    print "Last: ", $page->last_page, "\n";
-
-=head3 pageset
-
-C<pageset> method returns a L<Data::Pageset> instance
-
-    my $pageset = $res->pageset( 'fixed' );
-    $pageset->pages_per_set($pages_per_set);
-    my $set = $pageset->pages_in_set();
-    foreach my $num ( @$set ) {
-        print "$num ";
-    }
-
-=head3 page_param
-
-C<page_param> method returns a hash to specify the page for the next request.
-
-    my %hash  = $res->page_param( $page->next_page );
-
-=head3 page_query
-
-C<page_query> method returns a query string to specify the page for the next request.
-
-    my $query = $res->page_query( $page->prev_page );
-
-=head2 TreePP CONFIG
+=head2 utf8_flag / user_agent / lwp_useragent / http_lite
 
 This modules uses L<XML::TreePP> module internally.
 Following methods are available to configure it.
 
-    my $doko = WebService::Recruit::Dokoiku->new();
     $doko->utf8_flag( 1 );
     $doko->user_agent( 'Foo-Bar/1.0 ' );
     $doko->lwp_useragent( LWP::UserAgent->new() );

@@ -5,7 +5,7 @@
 {
     my $key = $ENV{DOKOIKU_API_KEY} if exists $ENV{DOKOIKU_API_KEY};
     plan skip_all => 'set DOKOIKU_API_KEY env to test this' unless $key;
-    plan tests => 16;
+    plan tests => 18;
     &test_main( $key );
 }
 # ----------------------------------------------------------------
@@ -22,6 +22,9 @@ sub test_main {
     };
     my $res = $doko->getStation( %$param );
     ok( ref $res, 'getStation' );
+
+    is( $res->param->lat_jgd, $param->{lat_jgd}, 'param lat_jgd' );
+    is( $res->param->lon_jgd, $param->{lon_jgd}, 'param lon_jgd' );
 
     my $root = $res->root;
     ok( ref $root, 'root' );

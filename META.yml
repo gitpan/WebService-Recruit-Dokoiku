@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                WebService-Recruit-Dokoiku
-version:             0.07
+version:             0.10
 abstract:            ~
 license:             perl
 generated_by:        ExtUtils::MakeMaker version 6.36

@@ -28,59 +28,44 @@ DESCRIPTION
     "getLandmark" and "getStation". With these methods, you can find almost
     all of shops, restaurants and many other places in Japan.
 
-   searchPOI
-    See WebService::Recruit::Dokoiku::SearchPOI for details.
+METHODS
+  new
+    This is the constructor method for this class.
+
+        my $doko = WebService::Recruit::Dokoiku->new();
+
+    This accepts optional parameters.
+
+        my $conf = { key => 'your_auth_key', utf8_flag => 1 };
+        my $doko = WebService::Recruit::Dokoiku->new( %$conf );
+
+  key
+    A valid developer key is required to make a request.
+
+        $doko->key( 'your_auth_key' );
+
+  searchPOI
+    This makes a request for "searchPOI" API. See
+    WebService::Recruit::Dokoiku::SearchPOI for details.
 
         my $res = $doko->searchPOI( lmcode => 4212, name => 'ATM' );
 
-   getLandmark
-    See WebService::Recruit::Dokoiku::GetLandmark for details.
+  getLandmark
+    This makes a request for "getLandmark" API. See
+    WebService::Recruit::Dokoiku::GetLandmark for details.
 
         my $res = $doko->getLandmark( name => 'SHIBUYA 109' );
 
-   getStation
-    See WebService::Recruit::Dokoiku::GetStation for details.
+  getStation
+    This makes a request for "getStation" API. See
+    WebService::Recruit::Dokoiku::GetStation for details.
 
         my $res = $doko->getStation( lon_jgd => 139.758, lat_jgd => 35.666 );
 
-  PAGING
-    Each API response also provides paging methods following:
-
-   page
-    "page" method returns a Data::Page instance.
-
-        my $page = $res->page();
-        print "Total: ", $page->total_entries, "\n";
-        print "Page: ", $page->current_page, "\n";
-        print "Last: ", $page->last_page, "\n";
-
-   pageset
-    "pageset" method returns a Data::Pageset instance
-
-        my $pageset = $res->pageset( 'fixed' );
-        $pageset->pages_per_set($pages_per_set);
-        my $set = $pageset->pages_in_set();
-        foreach my $num ( @$set ) {
-            print "$num ";
-        }
-
-   page_param
-    "page_param" method returns a hash to specify the page for the next
-    request.
-
-        my %hash  = $res->page_param( $page->next_page );
-
-   page_query
-    "page_query" method returns a query string to specify the page for the
-    next request.
-
-        my $query = $res->page_query( $page->prev_page );
-
-  TreePP CONFIG
+  utf8_flag / user_agent / lwp_useragent / http_lite
     This modules uses XML::TreePP module internally. Following methods are
     available to configure it.
 
-        my $doko = WebService::Recruit::Dokoiku->new();
         $doko->utf8_flag( 1 );
         $doko->user_agent( 'Foo-Bar/1.0 ' );
         $doko->lwp_useragent( LWP::UserAgent->new() );
