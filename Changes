@@ -1,5 +1,8 @@
 # WebService::Recruit::Dokoiku Changes
 
+2007/08/17 version 0.11:
+    - Class::Accessor::Children added on PREREQ_PM
+
 2007/08/16 version 0.10:
     - Class::Accessor::Children::Fast required
     - WebService::Recruit::Dokoiku::Base splitted

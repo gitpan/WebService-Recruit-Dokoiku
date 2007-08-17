@@ -7,6 +7,7 @@ my $opt = {
     PREREQ_PM           =>  {
         'Test::More'        =>  '0',
         'Class::Accessor'   =>  '0',
+        'Class::Accessor::Children'   =>  '0',
         'XML::OverHTTP'     =>  '0',
     },
 };
